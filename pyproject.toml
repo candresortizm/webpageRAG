@@ -1,0 +1,18 @@
+[project]
+name = "web-rag-langgraph"
+version = "0.0.1"
+dependencies = [
+    "beautifulsoup4==4.13.4", #Para extracción del texto
+    "lxml", #Para el manejo de los elementos html
+    "fastapi[standard]", #Exposición del endpoints
+    "langchain-community==0.3.20", #Para usar el extractor de URL
+]
+requires-python = ">=3.13"
+authors = [
+  {name = "Andres Ortiz", email = "candresortizm@gmail.com"}
+]
+maintainers = [
+  {name = "Andres Ortiz", email = "candresortizm@gmail.com"}
+]
+description = "Proyecto RAG para webs"
+readme = "README.md"
