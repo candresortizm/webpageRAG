@@ -1,4 +1,7 @@
 from langchain_aws import BedrockEmbeddings
+from dotenv import load_dotenv
+
+load_dotenv()
 
 class Embedding:
     _instance = None

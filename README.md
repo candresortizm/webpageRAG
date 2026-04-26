@@ -13,7 +13,7 @@ Activar el entorno virtual:
 
 Instalar las dependencias:
 
-pip install .
+pip install -e .
 
 Ejecutar el Api:
 

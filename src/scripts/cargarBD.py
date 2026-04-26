@@ -9,7 +9,6 @@ from dotenv import load_dotenv
 import time
 from rag.core.database import VectorDatabase
 
-
 load_dotenv()
 
 
@@ -22,7 +21,7 @@ def main():
     args = parser.parse_args()
     if args.reset:
         print("✨ Clearing Database")
-        VectorDatabase().limpiar_bd()
+        VectorDatabase.limpiar_bd()
 
     # Crea o actualiza la base de datos.
     documents = load_documents()
@@ -47,8 +46,9 @@ def split_documents(documents: list[Document]):
 
 def add_to_chroma(chunks: list[Document]):
     # Load the existing database.
-    db = VectorDatabase()
-    # Calculate Page IDs.
+    print(f'type(VectorDatabase()): {type(VectorDatabase())}')
+    print(f'type(VectorDatabase()._db): {type(VectorDatabase()._db)}')
+    db = VectorDatabase()._db    
     chunks_with_ids = calculate_chunk_ids(chunks)
     
     # Add or Update the documents.

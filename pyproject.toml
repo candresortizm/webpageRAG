@@ -10,6 +10,7 @@ dependencies = [
     "langchain-aws", #Para los modelos de Embedding y llm
     "boto3", # Para el uso de los servicios de AWS
     "langchain-chroma", #Base de datos vectorial
+    "langchain[google-genai]", #Para el llm
 ]
 requires-python = ">=3.13"
 authors = [
