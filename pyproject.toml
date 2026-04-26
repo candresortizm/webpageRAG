@@ -6,7 +6,10 @@ dependencies = [
     "lxml", #Para el manejo de los elementos html
     "fastapi[standard]", #Exposición del endpoints
     "langchain-community==0.3.20", #Para usar el extractor de URL
-    "python-dotenv", #Para el uso de variables de entorno
+    "python-dotenv", #Para el uso de variables de entorno,
+    "langchain-aws", #Para los modelos de Embedding y llm
+    "boto3", # Para el uso de los servicios de AWS
+    "langchain-chroma", #Base de datos vectorial
 ]
 requires-python = ">=3.13"
 authors = [

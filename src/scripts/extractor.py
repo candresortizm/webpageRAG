@@ -1,18 +1,15 @@
-from urllib import response
-
 from bs4 import BeautifulSoup
 import re, os
 from dotenv import load_dotenv
 from langchain_community.document_loaders import RecursiveUrlLoader
-import requests
 
 load_dotenv()
 
 PAGINA_WEB_EXTRAER = os.environ.get("PAGINA_WEB_EXTRAER", "https://google.com.co")
 
-def load_web_main(url_string: str):
+def cargar_web_main(url_string: str):
     try:
-        documents = load_web(url_string)
+        documents = cargar_web(url_string)
         guardar_txt(documents)
         print("Finalizado")
     except Exception as e:
@@ -21,17 +18,24 @@ def load_web_main(url_string: str):
     
 
 #Cargar recursivamente la documentación
-def load_web(url_string, profundidad=2):
+def cargar_web(url_string, profundidad=2):
     try:
         print("URL---->",url_string)
-        document_loader = RecursiveUrlLoader(url_string,extractor=bs4_extractor,max_depth=profundidad,encoding='utf-8')
-        return document_loader.load()
+        cargar_documentos = RecursiveUrlLoader(url_string,extractor=bs4_extractor,max_depth=profundidad,encoding='utf-8')
+        documents = cargar_documentos.load()
+        documents = [
+                    doc for doc in documents 
+                    if not doc.metadata['source'].lower().endswith('.json')
+                ]
+        return documents
     except Exception as e:
         print("Se presentóuna excepción", e)
 
 #Extractor para extraer el texto plano del HTML
 def bs4_extractor(html: str) -> str:
     soup = BeautifulSoup(html, "lxml")
+    for elementos_quitar in soup.find_all(["header", "nav", "footer", "aside"]):
+        elementos_quitar.decompose()
     return re.sub(r"\n\n+", "\n\n", soup.text).strip()
 
 def guardar_txt(documentos):
@@ -52,4 +56,4 @@ def guardar_txt(documentos):
         print("Se presentóuna excepción", e)
 
 if __name__ == "__main__":
-    load_web_main(PAGINA_WEB_EXTRAER)
+    cargar_web_main(PAGINA_WEB_EXTRAER)
