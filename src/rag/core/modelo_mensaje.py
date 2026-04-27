@@ -27,5 +27,4 @@ class QueryResponse:
 
 class SubmitQueryRequest(BaseModel):
     query_text: str
-    chat_history: list[tuple[str, str]]
     conversation_id: str

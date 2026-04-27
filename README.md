@@ -5,19 +5,39 @@ Proyecto de un modelo RAG que extrae información de una página web, la guarda 
 
 Se recomienda primero la creación de un entorno virtual.
 
+```
 python -m venv env
+```
 
 Activar el entorno virtual:
 
+```
 .\env\Scripts\activate
+```
 
 Instalar las dependencias:
 
+```
 pip install -e .
+```
 
 Ejecutar el Api:
 
+```
 python .\src\api_handler.py  
+```
+
+## Ejecución con el Dockerfile:
+
+### Crear la imagen
+```
+docker build -t web-rag-langgraph .
+```
+
+### Ejecutar la imagen
+```
+docker run --rm -p 8000:8000 --env-file .env web-rag-langgraph
+```
 
 ## Patrones de diseño implementados:
 * Singleton: En los archivos database.py, embedding_model.py Para tener una única conexión a la Base de datos

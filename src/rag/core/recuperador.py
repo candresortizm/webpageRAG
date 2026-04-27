@@ -46,15 +46,12 @@ def formatear_historial(chat_history, len_history=6):
 
 
 def query_rag(query_object) -> QueryResponse:
-    # 1. Recuperar historial previo de la DB (en lugar de confiar solo en el objeto)
     db_history = DatabaseManager().get_history(query_object.conversation_id)
     
-    # 2. Formatear para LangChain (ajusta según tu función formatear_historial)
     chat_formatted = formatear_historial(db_history)
 
     rag_response = rag_chain()
 
-    # 3. Invocar la cadena
     response = rag_response.invoke({
         "input": query_object.query_text,
         "chat_history": chat_formatted,
