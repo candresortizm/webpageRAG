@@ -1,5 +1,5 @@
 [project]
-name = "web-rag-langchain
+name = "web-rag-langchain"
 version = "0.0.1"
 dependencies = [
     "beautifulsoup4==4.13.4", #Para extracción del texto
