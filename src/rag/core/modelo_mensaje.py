@@ -12,6 +12,13 @@ Documentos: {context}
 Respuesta:
 """
 
+HISTORY_PROMPT_TEMPLATE = """
+Dado un historial de chat y la última pregunta del usuario que podría hacer referencia al contexto del historial de chat o no,
+Si la pregunta está relacionada con el historial NO responda la pregunta,
+sólo formule una pregunta independiente que pueda entenderse sin el historial de chat.
+Si no está relacionada con mensajes anteriores sólo responda la pregunta.
+"""
+
 @dataclass
 class QueryResponse:
     query_text: str
@@ -20,3 +27,5 @@ class QueryResponse:
 
 class SubmitQueryRequest(BaseModel):
     query_text: str
+    chat_history: list[tuple[str, str]]
+    conversation_id: str

@@ -220,3 +220,5 @@ __marimo__/
 .vscode/
 
 data/texto/
+
+chat_history.db

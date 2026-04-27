@@ -1,7 +1,6 @@
-import uvicorn
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from rag.core.modelo_mensaje import QueryResponse, SubmitQueryRequest
-from rag.core.recuperador import query_rag
+from rag.core.recuperador import query_rag, obtener_historial
 from scripts.extractor import cargar_web_main
 
 app = FastAPI()
@@ -20,4 +19,12 @@ def submit_query_endpoint(request: SubmitQueryRequest) -> QueryResponse:
     query_response = query_rag(request)
  
     return query_response
+
+@app.get("/history/{chat_id}")
+def get_history(chat_id: str):
+    try:
+        history = obtener_historial(chat_id)
+        return {"conversation_id": chat_id, "history": history}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 

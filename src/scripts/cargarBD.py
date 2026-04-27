@@ -7,7 +7,7 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.schema.document import Document
 from dotenv import load_dotenv
 import time
-from rag.core.database import VectorDatabase
+from rag.componentes.database import VectorDatabase
 
 load_dotenv()
 

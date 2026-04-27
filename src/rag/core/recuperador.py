@@ -1,42 +1,79 @@
 from dataclasses import dataclass
 from langchain.chains.retrieval import create_retrieval_chain
+from langchain.chains import create_history_aware_retriever
 from langchain.prompts import ChatPromptTemplate
-from rag.core.database import VectorDatabase
-from rag.core.llm_model import ModeloLLM
+from langchain.schema import AIMessage, HumanMessage
+from rag.componentes.database import VectorDatabase
+from rag.componentes.historial_db import DatabaseManager
+from rag.componentes.llm_model import ModeloLLM
 from langchain.chains.combine_documents import create_stuff_documents_chain
-from rag.core.modelo_mensaje import  PROMPT_TEMPLATE, QueryResponse
+from rag.core.modelo_mensaje import  HISTORY_PROMPT_TEMPLATE, PROMPT_TEMPLATE, QueryResponse
 
 def rag_chain():
     model = ModeloLLM()
-    vectorstore = VectorDatabase()
+    db = VectorDatabase()
+    condense_question_prompt = ChatPromptTemplate(
+        [
+            ("system", HISTORY_PROMPT_TEMPLATE),
+            ("placeholder", "{chat_history}"),
+            ("human", "{input}"),
+        ]
+    )
+    history_aware_retriever = create_history_aware_retriever(
+                                    model, db.as_retriever(search_type="similarity", search_kwargs={"k": 3}), condense_question_prompt
+                                )
 
-    retriever = vectorstore.as_retriever(search_kwargs={"k": 5})
     qa_prompt = ChatPromptTemplate(
         [
             ("system", PROMPT_TEMPLATE),
             ("human", "{input}"),
         ]
     )
+    qa_chain = create_stuff_documents_chain(model, qa_prompt)
+    convo_qa_chain = create_retrieval_chain(history_aware_retriever, qa_chain)
 
-    combine_docs_chain = create_stuff_documents_chain(model, qa_prompt)
+    return convo_qa_chain
 
-    qa_chain = create_retrieval_chain(retriever, combine_docs_chain)
-
-    return qa_chain
+def formatear_historial(chat_history, len_history=6):
+    formatted_history = []
+    if len(chat_history) > 0:
+        for human, ai in chat_history[-len_history:]:
+            formatted_history.append(HumanMessage(content=human))
+            formatted_history.append(AIMessage(content=ai))
+        return formatted_history
+    else:
+        return chat_history
 
 
 def query_rag(query_object) -> QueryResponse:
+    # 1. Recuperar historial previo de la DB (en lugar de confiar solo en el objeto)
+    db_history = DatabaseManager().get_history(query_object.conversation_id)
+    
+    # 2. Formatear para LangChain (ajusta según tu función formatear_historial)
+    chat_formatted = formatear_historial(db_history)
+
     rag_response = rag_chain()
 
+    # 3. Invocar la cadena
     response = rag_response.invoke({
-        "input": query_object.query_text
+        "input": query_object.query_text,
+        "chat_history": chat_formatted,
     })
+    
     response_text = response["answer"]
     results = response["context"]
-
     sources = [doc.metadata.get("id", None) for doc in results]
-    print(f"Response: {response_text}\nSources: {sources}")
+
+    # 4. PERSISTENCIA: Guardar la pregunta del usuario y la respuesta de la IA
+    DatabaseManager().save_message(query_object.conversation_id, query_object.query_text, response_text)
 
     return QueryResponse(
-        query_text=query_object.query_text, response_text=response_text, sources=sources
+        query_text=query_object.query_text, 
+        response_text=response_text, 
+        sources=sources
     )
+
+def obtener_historial(conversation_id: str) -> list[tuple[str, str]]:
+    db_history = DatabaseManager().get_history(conversation_id)
+    chat_formatted = formatear_historial(db_history)
+    return chat_formatted
