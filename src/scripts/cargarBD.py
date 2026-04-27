@@ -11,11 +11,11 @@ from rag.componentes.database import VectorDatabase
 
 load_dotenv()
 
-
+#Carpeta en donde se almacenarán los archivos de texto extraídos de la página web.
 DATA_SOURCE_PATH = "data/texto"
 
-def main():
-    # Punto de entrada y orquestador de la carga de documentos a la base de datos.
+# Punto de entrada y orquestador de la carga de documentos a la base de datos.
+def main():    
     parser = argparse.ArgumentParser()
     parser.add_argument("--reset", action="store_true", help="Reset the database.")
     args = parser.parse_args()
@@ -33,7 +33,7 @@ def load_documents():
     document_loader = DirectoryLoader(path=DATA_SOURCE_PATH, glob="**/*.txt", loader_cls=TextLoader, loader_kwargs={'encoding': 'utf-8'})
     return document_loader.load()
 
-
+#Se generan los chunks del texto.
 def split_documents(documents: list[Document]):
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=1500,
@@ -43,7 +43,7 @@ def split_documents(documents: list[Document]):
     )
     return text_splitter.split_documents(documents)
 
-
+#Se añade a la base de datos vectorial.
 def add_to_chroma(chunks: list[Document]):
     # Load the existing database.
     print(f'type(VectorDatabase()): {type(VectorDatabase())}')
@@ -75,6 +75,7 @@ def add_to_chroma(chunks: list[Document]):
     else:
         print("✅ No new documents to add")
 
+#Generación de los IDs de los chunks, para evitar duplicados en la base de datos.
 def calculate_chunk_ids(chunks):
     last_page_id = None
     current_chunk_index = 0
@@ -99,5 +100,6 @@ def calculate_chunk_ids(chunks):
 
     return chunks
 
+#Si se llama desde la consola, se ejecuta el método main.
 if __name__ == "__main__":
     main()

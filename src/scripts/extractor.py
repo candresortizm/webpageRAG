@@ -7,6 +7,7 @@ load_dotenv()
 
 PAGINA_WEB_EXTRAER = os.environ.get("PAGINA_WEB_EXTRAER", "https://google.com.co")
 
+# Método principal que se encarga de cargar la página web, extraer su contenido y guardarlo en archivos txt.
 def cargar_web_main(url_string: str):
     try:
         documents = cargar_web(url_string)
@@ -15,8 +16,6 @@ def cargar_web_main(url_string: str):
     except Exception as e:
         print("Se presentóuna excepción", e)
     
-    
-
 #Cargar recursivamente la documentación
 def cargar_web(url_string, profundidad=2):
     try:
@@ -55,5 +54,6 @@ def guardar_txt(documentos):
     except Exception as e:
         print("Se presentóuna excepción", e)
 
+# Si se llama desde la consola, se ejecuta el método cargar_web_main con la URL definida en el archivo .env
 if __name__ == "__main__":
     cargar_web_main(PAGINA_WEB_EXTRAER)

@@ -9,6 +9,7 @@ from rag.componentes.llm_model import ModeloLLM
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from rag.core.modelo_mensaje import  HISTORY_PROMPT_TEMPLATE, PROMPT_TEMPLATE, QueryResponse
 
+#Creación de la cadena RAG, que se encargará de procesar las consultas del usuario, recuperar la información relevante de la base de datos vectorial y generar una respuesta utilizando el modelo de lenguaje.
 def rag_chain():
     model = ModeloLLM()
     db = VectorDatabase()
@@ -19,8 +20,10 @@ def rag_chain():
             ("human", "{input}"),
         ]
     )
+
+    #Si la pregunta está relacionada con mensajes anteriores se reformula la pregunta para que el modelo de lenguaje pueda entender el contexto de la conversación.
     history_aware_retriever = create_history_aware_retriever(
-                                    model, db.as_retriever(search_type="similarity", search_kwargs={"k": 3}), condense_question_prompt
+                                    model, db.as_retriever(search_type="similarity", search_kwargs={"k": 5}), condense_question_prompt
                                 )
 
     qa_prompt = ChatPromptTemplate(
@@ -61,7 +64,6 @@ def query_rag(query_object) -> QueryResponse:
     results = response["context"]
     sources = [doc.metadata.get("id", None) for doc in results]
 
-    # 4. PERSISTENCIA: Guardar la pregunta del usuario y la respuesta de la IA
     DatabaseManager().save_message(query_object.conversation_id, query_object.query_text, response_text)
 
     return QueryResponse(
